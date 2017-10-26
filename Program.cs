@@ -136,6 +136,7 @@ namespace MYC
         }
 
 
+        //==========================================================
         static Boolean GetIsResultValid( BittrexMsg Msg )
         {
             if( !Msg.Success )
