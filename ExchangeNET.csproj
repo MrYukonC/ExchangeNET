@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.0</TargetFramework>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.CSharp" Version="4.4.0" />
+    <PackageReference Include="System.Runtime" Version="4.3.0" />
+    <PackageReference Include="System.Threading" Version="4.3.0" />
+    <PackageReference Include="System.Net.Http" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Serialization.Xml" Version="4.3.0" />
+    <PackageReference Include="System.Runtime.Serialization.Json" Version="4.3.0" />
+
+    <!-- https://github.com/aspnet/Home/issues/1558 -->
+    <!-- https://www.myget.org/feed/aspnetwebstacknightly/package/nuget/Microsoft.AspNet.WebApi.Client/5.2.4-alpha1-170218 -->
+    <PackageReference Include="Microsoft.AspNet.WebApi.Client" Version="5.2.4-alpha1-170218" />
+
+    <PackageReference Include="System.Security.Cryptography.Algorithms" Version="4.3.0" />
+  </ItemGroup>
+
+</Project>
