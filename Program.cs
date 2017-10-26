@@ -41,7 +41,7 @@ namespace MYC
         {
             MYC.Bittrex B = new MYC.Bittrex( "YOUR_BITTREX_API_KEY_HERE", "YOUR_BITTREX_API_SECRET_HERE" );
             
-            //BittrexAutoSell( B, "ZEC", "ETH" );
+            BittrexAutoSell( B, "ZEC", "ETH" );
 
             //TestGetMarkets( B );
             //TestGetCurrencies( B );
@@ -103,8 +103,9 @@ namespace MYC
                 Console.WriteLine( String.Format( "{0} balance: {1:0.00000000}", SellCurrency, SellBalance.Result.Available ) );
 
                 if( !String.IsNullOrEmpty( SellOrderUuid ) )
-                    if( B.Cancel( SellOrderUuid ).Success )
-                        SellOrderUuid = String.Empty;
+                    B.Cancel( SellOrderUuid );
+                    
+                SellOrderUuid = String.Empty;
 
                 BittrexResult<BittrexOrderBook> OrderBook = B.GetOrderBook( Market, BittrexOrderBook.Type.Buy, 1 );
 
