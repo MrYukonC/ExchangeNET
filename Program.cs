@@ -35,13 +35,30 @@ using System.Threading;
 
 namespace MYC
 {
+    public enum Exchange
+    {
+        Unknown,
+        Bittrex,
+        Poloniex
+    }
+
     class Program
     {
+        // static Exchange s_Exchange  = Exchange.Unknown;
+        // static String   s_APIKey    = String.Empty;
+        // static String   s_APISecret = String.Empty;
+
+
+        //==========================================================
         static void Main( String[] Args )
         {
-            MYC.Bittrex B = new MYC.Bittrex( "YOUR_BITTREX_API_KEY_HERE", "YOUR_BITTREX_API_SECRET_HERE" );
+            // Check the following out for parsing command line args:
+            // https://blog.terribledev.io/Parsing-cli-arguments-in-dotnet-core-Console-App/
+
+            BittrexExt B = new BittrexExt( "BITTREX_API_KEY_HERE", "BITTREX_API_SECRET_HERE" );
             
-            BittrexAutoSell( B, "ZEC", "ETH" );
+            B.AutoSell( "ZEC", "ETH" );
+            B.WithdrawAll( "ETH", "YOUR_DESTINATION_ADDRESS_HERE" );
 
             //TestGetMarkets( B );
             //TestGetCurrencies( B );
@@ -59,81 +76,6 @@ namespace MYC
             //TestGetDepositHistory( B, "ZEC" );
             //TestGetDepositAddress( B, "ZEC" );
             //TestGetDepositAddress( B, "ETH" );
-        }
-
-
-        //==========================================================
-        static Boolean BittrexGetIsCurrencyValid( String Currency )
-        {
-            return !String.IsNullOrEmpty( Currency ) && Currency.Length == 3;
-        }
-
-
-        //==========================================================
-        static void BittrexAutoSell( Bittrex B, String SellCurrency, String BuyCurrency, Double MinSellThresh = 0.001 )
-        {
-            const Int32 SleepMS = 1000;
-
-            if( !BittrexGetIsCurrencyValid( SellCurrency ) )
-                return;
-
-            if( !BittrexGetIsCurrencyValid( BuyCurrency ) )
-                return;
-
-            String Market = BuyCurrency.ToUpper() + "-" + SellCurrency.ToUpper();
-
-            String SellOrderUuid = String.Empty;
-
-            while( true )
-            {
-                BittrexResult<BittrexBalance> SellBalance = B.GetBalance( SellCurrency );
-
-                if( !SellBalance.Success )
-                {
-                    Console.WriteLine( SellBalance.Message );
-                    break;
-                }
-
-                if( SellBalance.Result.Available < MinSellThresh )
-                {
-                    Console.WriteLine( String.Format( "{0:0.00000000} {1} does not meet the specified minimum sell amount threshold of {2} {3}", SellBalance.Result.Available, SellCurrency, MinSellThresh, SellCurrency ) );
-                    break;
-                }
-
-                Console.WriteLine( String.Format( "{0} balance: {1:0.00000000}", SellCurrency, SellBalance.Result.Available ) );
-
-                if( !String.IsNullOrEmpty( SellOrderUuid ) )
-                    B.Cancel( SellOrderUuid );
-                    
-                SellOrderUuid = String.Empty;
-
-                BittrexResult<BittrexOrderBook> OrderBook = B.GetOrderBook( Market, BittrexOrderBook.Type.Buy, 1 );
-
-                if( !OrderBook.Success )
-                {
-                    Console.WriteLine( OrderBook.Message );
-                    Thread.Sleep( SleepMS );
-                    continue;
-                }
-
-                BittrexOrderBook.Entry BestOffer = OrderBook.Result.Buy[ 0 ];
-
-                Double SellAmount = Math.Min( SellBalance.Result.Available, BestOffer.Quantity );
-
-                Console.WriteLine( String.Format( "Attempt to sell {0:0.00000000} {1} @ {2:0.00000000} {3}/{4}", SellAmount, SellCurrency, BestOffer.Rate, SellCurrency, BuyCurrency ) );
-
-                BittrexResult<BittrexUuid> OrderUuid = B.SellLimit( Market, SellAmount, BestOffer.Rate );
-
-                if( !OrderUuid.Success )
-                {
-                    Console.WriteLine( OrderUuid.Message );
-                    continue;
-                }
-
-                SellOrderUuid = OrderUuid.Result.Uuid;
-
-                Thread.Sleep( SleepMS );
-            }
         }
 
 

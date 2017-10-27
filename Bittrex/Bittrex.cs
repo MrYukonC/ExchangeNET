@@ -49,7 +49,7 @@ namespace MYC
 
 
         //==========================================================
-        public Bittrex( String APIKey, String APISecret, Int32 TimeoutInMS = 5000 )
+        public Bittrex( String APIKey, String APISecret )
         {
             m_APIKey        = APIKey;
             m_APISecret     = APISecret;
