@@ -49,7 +49,17 @@ namespace MYC
 
 
         //==========================================================
-        public void AutoSell( String SellCurrency, String BuyCurrency, Double MinSellThresh = 0.001 )
+        public static Boolean GetIsMarketValid( Bittrex B, String Market )
+        {
+            if( String.IsNullOrEmpty( Market ) || Market.Length != 7 )
+                return false;
+
+            return B.GetOrderBook( Market, BittrexOrderBook.Type.Buy, 1 ).Success;
+        }
+
+
+        //==========================================================
+        public void AutoSell( String Market, String SellCurrency, String BuyCurrency, Double MinSellThresh = 0.001 )
         {
             const Int32 SleepMS = 1000;
 
@@ -59,7 +69,10 @@ namespace MYC
             if( !GetIsCurrencyValid( BuyCurrency ) )
                 return;
 
-            String Market = BuyCurrency.ToUpper() + "-" + SellCurrency.ToUpper();
+            if( !GetIsMarketValid( this, Market ) )
+                return;
+
+            //String Market = BuyCurrency.ToUpper() + "-" + SellCurrency.ToUpper();            
 
             String SellOrderUuid = String.Empty;
 
@@ -91,8 +104,9 @@ namespace MYC
                 if( !OrderBook.Success )
                 {
                     Console.WriteLine( OrderBook.Message );
-                    Thread.Sleep( SleepMS );
-                    continue;
+                    //Thread.Sleep( SleepMS );
+                    //continue;
+                    break;
                 }
 
                 BittrexOrderBook.Entry BestOffer = OrderBook.Result.Buy[ 0 ];

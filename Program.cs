@@ -57,7 +57,7 @@ namespace MYC
 
             BittrexExt B = new BittrexExt( "BITTREX_API_KEY_HERE", "BITTREX_API_SECRET_HERE" );
             
-            B.AutoSell( "ZEC", "ETH" );
+            B.AutoSell( "BTC-ZEC", "ZEC", "BTC" );
             B.WithdrawAll( "ETH", "YOUR_DESTINATION_ADDRESS_HERE" );
 
             //TestGetMarkets( B );
