@@ -37,33 +37,26 @@ using System.Net.Http.Headers;
 
 namespace MYC
 {
-    public class BittrexHttpClient
+    public class BittrexHttpClient : ExchangeHttpClient
     {
-        System.Net.Http.HttpClient m_HttpClient;
+        //==========================================================
+        public BittrexHttpClient( String URL ) : base( URL ) {}
 
 
         //==========================================================
-        public BittrexHttpClient( String URL )
+        public override Task<HttpResponseMessage> Get( String APICall, Signer S = null )
         {
-            m_HttpClient = new System.Net.Http.HttpClient();
-            m_HttpClient.BaseAddress = new Uri( URL );
-        }
+            base.HttpClient.DefaultRequestHeaders.Accept.Clear();
+            base.HttpClient.DefaultRequestHeaders.Accept.Add( new MediaTypeWithQualityHeaderValue( "application/json" ) );
 
-
-        //==========================================================
-        public Task<HttpResponseMessage> Get( String APICall, String APICallSigned = null )
-        {
-            m_HttpClient.DefaultRequestHeaders.Accept.Clear();
-            m_HttpClient.DefaultRequestHeaders.Accept.Add( new MediaTypeWithQualityHeaderValue( "application/json" ) );
-
-            if( !String.IsNullOrEmpty( APICallSigned ) )
+            if( S != null && !String.IsNullOrEmpty( S.APICallSigned ) )
             {
                 // https://stackoverflow.com/questions/35907642/custom-header-to-httpclient-request
-                m_HttpClient.DefaultRequestHeaders.Clear();
-                m_HttpClient.DefaultRequestHeaders.Add( "apisign", APICallSigned );
+                base.HttpClient.DefaultRequestHeaders.Clear();
+                base.HttpClient.DefaultRequestHeaders.Add( "apisign", S.APICallSigned );
             }
 
-            return m_HttpClient.GetAsync( APICall );
+            return base.HttpClient.GetAsync( APICall );
         }
     }
 }

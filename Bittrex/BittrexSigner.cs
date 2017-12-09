@@ -47,12 +47,12 @@ namespace MYC
         //==========================================================
         public override void Sign( String APICall, String APIArgs, String APIKey, String APISecret )
         {
-            base.APICallFinal = APICall + "?";
+            String APICallFinal = APICall + "?";
             
             if( !String.IsNullOrEmpty( APIArgs ) )
-                base.APICallFinal += APIArgs + "&";
+                APICallFinal += APIArgs + "&";
 
-            base.APICallFinal += "apikey=" + APIKey + "&nonce=" + DateTimeOffset.Now.ToUnixTimeMilliseconds();
+            APICallFinal += "apikey=" + APIKey + "&nonce=" + DateTimeOffset.Now.ToUnixTimeMilliseconds();
 
             // https://stackoverflow.com/questions/8063004/what-is-the-net-equivalent-of-the-php-function-hash-hmac
             // https://msdn.microsoft.com/en-us/library/system.security.cryptography.hmacsha512(v=vs.110).aspx
@@ -60,7 +60,9 @@ namespace MYC
             Byte[]      HashResult = SHA512Hash.ComputeHash( System.Text.Encoding.UTF8.GetBytes( APICallFinal ) );
 
             // https://stackoverflow.com/questions/623104/byte-to-hex-string
-            base.APICallSigned = BitConverter.ToString( HashResult ).Replace( "-", String.Empty );
+            String APICallSigned = BitConverter.ToString( HashResult ).Replace( "-", String.Empty );
+
+            base.SignInternal( APIKey, APISecret, APICallFinal, APICallSigned );
         }
     }
 }

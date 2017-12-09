@@ -120,10 +120,84 @@ namespace MYC
                 if( !OrderUuid.Success )
                 {
                     Console.WriteLine( OrderUuid.Message );
-                    continue;
+                    //continue;
+                    break;
                 }
 
                 SellOrderUuid = OrderUuid.Result.Uuid;
+
+                Thread.Sleep( SleepMS );
+            }
+        }
+
+
+        //==========================================================
+        public void AutoBuy( String Market, String SellCurrency, String BuyCurrency, Double MinSellThresh = 0.001 )
+        {
+            const Int32 SleepMS = 1000;
+
+            if( !GetIsCurrencyValid( SellCurrency ) )
+                return;
+
+            if( !GetIsCurrencyValid( BuyCurrency ) )
+                return;
+
+            if( !GetIsMarketValid( this, Market ) )
+                return;
+
+            String BuyOrderUuid = String.Empty;
+
+            while( true )
+            {
+                BittrexResult<BittrexBalance> SellBalance = base.GetBalance( SellCurrency );
+
+                if( !SellBalance.Success )
+                {
+                    Console.WriteLine( SellBalance.Message );
+                    break;
+                }
+
+                if( SellBalance.Result.Available < MinSellThresh )
+                {
+                    Console.WriteLine( String.Format( "{0:0.00000000} {1} does not meet the specified minimum sell amount threshold of {2} {3}", SellBalance.Result.Available, SellCurrency, MinSellThresh, SellCurrency ) );
+                    break;
+                }
+
+                Console.WriteLine( String.Format( "{0} balance: {1:0.00000000}", SellCurrency, SellBalance.Result.Available ) );
+
+                if( !String.IsNullOrEmpty( BuyOrderUuid ) )
+                    base.Cancel( BuyOrderUuid );
+                    
+                BuyOrderUuid = String.Empty;
+
+                BittrexResult<BittrexOrderBook> OrderBook = base.GetOrderBook( Market, BittrexOrderBook.Type.Sell, 1 );
+
+                if( !OrderBook.Success )
+                {
+                    Console.WriteLine( OrderBook.Message );
+                    //Thread.Sleep( SleepMS );
+                    //continue;
+                    break;
+                }
+
+                BittrexOrderBook.Entry BestOffer = OrderBook.Result.Sell[ 0 ];
+
+                Double BuyAmount = Math.Min( BestOffer.Quantity, SellBalance.Result.Available / BestOffer.Rate );
+
+                BuyAmount = Math.Truncate( BuyAmount * 10 ) / 10;
+
+                Console.WriteLine( String.Format( "Attempt to buy {0:0.00000000} {1} @ {2:0.00000000} {3}/{4} for a total of {5:0.000000000000} {6}", BuyAmount, BuyCurrency, BestOffer.Rate, SellCurrency, BuyCurrency, BuyAmount * BestOffer.Rate, SellCurrency ) );
+
+                BittrexResult<BittrexUuid> OrderUuid = base.BuyLimit( Market, BuyAmount, BestOffer.Rate );
+
+                if( !OrderUuid.Success )
+                {
+                    Console.WriteLine( OrderUuid.Message );
+                    //continue;
+                    break;
+                }
+
+                BuyOrderUuid = OrderUuid.Result.Uuid;
 
                 Thread.Sleep( SleepMS );
             }

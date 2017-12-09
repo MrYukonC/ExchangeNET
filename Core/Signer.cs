@@ -35,9 +35,24 @@ namespace MYC
 {
     public abstract class Signer
     {
-        public String APICallFinal  { get; protected set; }
-        public String APICallSigned { get; protected set; }
+        public String APIKey        { get; private set; }
+        public String APISecret     { get; private set; }
 
-        public abstract void Sign( String APICall, String APIArgs, String APIKey, String APISecret );
+        public String APICallFinal  { get; private set; }
+        public String APICallSigned { get; private set; }
+
+
+        //==========================================================
+        public abstract void Sign( String APICall, String APIArgs, String InAPIKey, String InAPISecret );
+
+
+        //==========================================================
+        protected  void SignInternal( String InAPIKey, String InAPISecret, String InAPICallFinal, String InAPISigned )
+        {
+            APIKey          = InAPIKey;
+            APISecret       = InAPISecret;
+            APICallFinal    = InAPICallFinal;
+            APICallSigned   = InAPISigned;
+        }
     }
 }

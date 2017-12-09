@@ -45,7 +45,7 @@ namespace MYC
         private String              m_APIKey;
         private String              m_APISecret;
 
-        private BittrexHttpClient   m_HttpClient;
+        private ExchangeHttpClient  m_HttpClient;
 
 
         //==========================================================
@@ -58,11 +58,11 @@ namespace MYC
 
 
         //==========================================================
-        protected BittrexMsg GetInternal<T>( String APICall, String APICallSigned = null ) where T : BittrexMsg, new()
+        protected BittrexMsg GetInternal<T>( String APICall, Signer S = null ) where T : BittrexMsg, new()
         {
             try
             {
-                Task<HttpResponseMessage> ResponseTask = m_HttpClient.Get( APICall, APICallSigned );
+                Task<HttpResponseMessage> ResponseTask = m_HttpClient.Get( APICall, S );
 
                 if( ResponseTask == null )
                     return new T().Init( false, "Failed to get response task." );
@@ -157,7 +157,7 @@ namespace MYC
         {
             Signer S = new BittrexSigner( API_URL + API_VER + "/market/buylimit", "market=" + Market + "&quantity=" + Quantity + "&rate=" + Rate, m_APIKey, m_APISecret );
 
-            return GetInternal<BittrexResult<BittrexUuid>>( S.APICallFinal, S.APICallSigned ) as BittrexResult<BittrexUuid>;
+            return GetInternal<BittrexResult<BittrexUuid>>( S.APICallFinal, S ) as BittrexResult<BittrexUuid>;
         }
 
 
@@ -166,7 +166,7 @@ namespace MYC
         {
             Signer S = new BittrexSigner( API_URL + API_VER + "/market/selllimit", "market=" + Market + "&quantity=" + Quantity + "&rate=" + Rate, m_APIKey, m_APISecret );
 
-            return GetInternal<BittrexResult<BittrexUuid>>( S.APICallFinal, S.APICallSigned ) as BittrexResult<BittrexUuid>;
+            return GetInternal<BittrexResult<BittrexUuid>>( S.APICallFinal, S ) as BittrexResult<BittrexUuid>;
         }
 
 
@@ -175,7 +175,7 @@ namespace MYC
         {
             Signer S = new BittrexSigner( API_URL + API_VER + "/market/cancel", "uuid=" + OrderUuid, m_APIKey, m_APISecret );
 
-             return GetInternal<BittrexResult<BittrexUuid>>( S.APICallFinal, S.APICallSigned ) as BittrexResult<String>;
+             return GetInternal<BittrexResult<BittrexUuid>>( S.APICallFinal, S ) as BittrexResult<String>;
         }
 
 
@@ -184,7 +184,7 @@ namespace MYC
         {
             Signer S = new BittrexSigner( API_URL + API_VER + "/account/getopenorders", "market=" + Market, m_APIKey, m_APISecret );
 
-            return GetInternal<BittrexResult<List<BittrexOrder1>>>( S.APICallFinal, S.APICallSigned ) as BittrexResult<List<BittrexOrder1>>;
+            return GetInternal<BittrexResult<List<BittrexOrder1>>>( S.APICallFinal, S ) as BittrexResult<List<BittrexOrder1>>;
         }
 
 
@@ -193,7 +193,7 @@ namespace MYC
         {
             Signer S = new BittrexSigner( API_URL + API_VER + "/account/getbalances", null, m_APIKey, m_APISecret );
 
-            return GetInternal<BittrexResult<List<BittrexBalance>>>( S.APICallFinal, S.APICallSigned ) as BittrexResult<List<BittrexBalance>>;
+            return GetInternal<BittrexResult<List<BittrexBalance>>>( S.APICallFinal, S ) as BittrexResult<List<BittrexBalance>>;
         }
 
 
@@ -202,7 +202,7 @@ namespace MYC
         {
             Signer S = new BittrexSigner( API_URL + API_VER + "/account/getbalance", "currency=" + Currency, m_APIKey, m_APISecret );
 
-            return GetInternal<BittrexResult<BittrexBalance>>( S.APICallFinal, S.APICallSigned ) as BittrexResult<BittrexBalance>;
+            return GetInternal<BittrexResult<BittrexBalance>>( S.APICallFinal, S ) as BittrexResult<BittrexBalance>;
         }
 
 
@@ -211,7 +211,7 @@ namespace MYC
         {
             Signer S = new BittrexSigner( API_URL + API_VER + "/account/getdepositaddress", "currency=" + Currency, m_APIKey, m_APISecret );
 
-            return GetInternal<BittrexResult<BittrexAddress>>( S.APICallFinal, S.APICallSigned ) as BittrexResult<BittrexAddress>;
+            return GetInternal<BittrexResult<BittrexAddress>>( S.APICallFinal, S ) as BittrexResult<BittrexAddress>;
         }
 
 
@@ -226,7 +226,7 @@ namespace MYC
 
             Signer S = new BittrexSigner( APICall, APIArgs, m_APIKey, m_APISecret );
 
-            return GetInternal<BittrexResult<BittrexUuid>>( S.APICallFinal, S.APICallSigned ) as BittrexResult<BittrexUuid>;
+            return GetInternal<BittrexResult<BittrexUuid>>( S.APICallFinal, S ) as BittrexResult<BittrexUuid>;
         }
 
 
@@ -235,7 +235,7 @@ namespace MYC
         {
             Signer S = new BittrexSigner( API_URL + API_VER + "/account/getorder", "uuid=" + OrderUuid, m_APIKey, m_APISecret );
 
-            return GetInternal<BittrexResult<BittrexOrder2>>( S.APICallFinal, S.APICallSigned ) as BittrexResult<BittrexOrder2>;
+            return GetInternal<BittrexResult<BittrexOrder2>>( S.APICallFinal, S ) as BittrexResult<BittrexOrder2>;
         }
 
 
@@ -244,7 +244,7 @@ namespace MYC
         {
             Signer S = new BittrexSigner( API_URL + API_VER + "/account/getorderhistory", String.IsNullOrEmpty( Market ) ? null : "market=" + Market, m_APIKey, m_APISecret );
 
-            return GetInternal<BittrexResult<List<BittrexOrder1>>>( S.APICallFinal, S.APICallSigned ) as BittrexResult<List<BittrexOrder1>>;
+            return GetInternal<BittrexResult<List<BittrexOrder1>>>( S.APICallFinal, S ) as BittrexResult<List<BittrexOrder1>>;
         }
 
 
@@ -253,7 +253,7 @@ namespace MYC
         {
             Signer S = new BittrexSigner( API_URL + API_VER + "/account/getwithdrawalhistory", String.IsNullOrEmpty( Currency ) ? null : "currency=" + Currency, m_APIKey, m_APISecret );
 
-            return GetInternal<BittrexResult<List<BittrexWithdrawal>>>( S.APICallFinal, S.APICallSigned ) as BittrexResult<List<BittrexWithdrawal>>;
+            return GetInternal<BittrexResult<List<BittrexWithdrawal>>>( S.APICallFinal, S ) as BittrexResult<List<BittrexWithdrawal>>;
         }
 
 
@@ -262,7 +262,7 @@ namespace MYC
         {
             Signer S = new BittrexSigner( API_URL + API_VER + "/account/getdeposithistory", String.IsNullOrEmpty( Currency ) ? null : "currency=" + Currency, m_APIKey, m_APISecret );
 
-            return GetInternal<BittrexResult<List<BittrexDeposit>>>( S.APICallFinal, S.APICallSigned ) as BittrexResult<List<BittrexDeposit>>;
+            return GetInternal<BittrexResult<List<BittrexDeposit>>>( S.APICallFinal, S ) as BittrexResult<List<BittrexDeposit>>;
         }
     }
 }

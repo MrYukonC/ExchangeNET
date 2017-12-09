@@ -1,7 +1,7 @@
-﻿//=================================================================================
+//=================================================================================
 //
 //  Created by: MrYukonC
-//  Created on: 21 OCT 2017
+//  Created on: 06 DEC 2017
 //
 //=================================================================================
 //
@@ -30,39 +30,25 @@
 //=================================================================================
 
 using System;
-using System.Collections.Generic;
-using System.Threading;
+using System.Threading.Tasks;
+using System.Net.Http;
 
 namespace MYC
 {
-    public enum Exchange
+    public abstract class ExchangeHttpClient
     {
-        Unknown,
-        Bittrex,
-        Poloniex
-    }
-
-    class Program
-    {
-        // static Exchange s_Exchange  = Exchange.Unknown;
-        // static String   s_APIKey    = String.Empty;
-        // static String   s_APISecret = String.Empty;
+        protected System.Net.Http.HttpClient HttpClient { get; private set; }
 
 
         //==========================================================
-        static void Main( String[] Args )
+        public ExchangeHttpClient( String URL )
         {
-            // Check the following out for parsing command line args:
-            // https://blog.terribledev.io/Parsing-cli-arguments-in-dotnet-core-Console-App/
-
-            BittrexExt B = new BittrexExt( "BITTREX_API_KEY_HERE", "BITTREX_API_SECRET_HERE" );
-            
-            B.AutoBuy( "BTC-OMG", "BTC", "OMG" );
-            //B.AutoSell( "BTC-ZEC", "ZEC", "BTC" );
-            //B.WithdrawAll( "ETH", "YOUR_DESTINATION_ADDRESS_HERE" );
-
-            //Poloniex P = new Poloniex( "BITTREX_API_KEY_HERE", "BITTREX_API_SECRET_HERE" );            
-            //P.ReturnBalances();
+            this.HttpClient = new System.Net.Http.HttpClient();
+            this.HttpClient.BaseAddress = new Uri( URL );
         }
+
+
+        //==========================================================
+        public abstract Task<HttpResponseMessage> Get( String APICall, Signer S = null );
     }
 }
